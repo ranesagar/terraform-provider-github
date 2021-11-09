@@ -706,4 +706,3 @@ func flattenBranches(branches []*github.Branch) []interface{} {
 
 	return branchList
 }
-
