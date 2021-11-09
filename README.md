@@ -17,6 +17,7 @@ Terraform Provider GitHub
 
 Detailed documentation for the GitHub provider can be found [here](https://www.terraform.io/docs/providers/github/index.html).
 
+
 ## Contributing
 
 Detailed documentation for contributing to the GitHub provider can be found [here](CONTRIBUTING.md).
