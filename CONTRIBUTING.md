@@ -2,7 +2,7 @@
 
 Hi there! We're thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
 
-Contributions to this project are [released](https://help.github.com/articles/github-terms-of-service/#6-contributions-under-repository-license) to the public under the [project's open source license](LICENSE.md).
+Contributions to this project are [released](https://help.github.com/articles/github-terms-of-service/#6-contributions-under-repository-license) to the public under the [project's open source license](LICENSE).
 
 Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
@@ -48,11 +48,11 @@ Once you have the repository cloned, there's a couple of additional steps you'll
 1. Write a test describing what you will fix. See [`github_label`](./github/resource_github_issue_label_test.go) for an example format.
 1. Run your test and observe it fail. Enabling debug output allows for observing the underlying requests and responses made as well as viewing state (search `STATE:`) generated during the acceptance test run.
 ```sh
-TF_LOG=DEBUG TF_ACC=1  go test -v   ./... -run ^TestAccGithubIssueLabel
+TF_LOG=DEBUG TF_ACC=1 go test -v ./... -run ^TestAccGithubIssueLabel
 ```
 1. Align the resource's implementation to your test case and observe it pass:
 ```sh
-TF_ACC=1  go test -v   ./... -run ^TestAccGithubIssueLabel
+TF_ACC=1 go test -v ./... -run ^TestAccGithubIssueLabel
 ```
 
 Note that some resources still use a previous format that is incompatible with automated test runs, which depend on using the `skipUnlessMode` helper. When encountering these resources, tests are rewritten to the latest format.
@@ -156,13 +156,7 @@ $ $GOPATH/bin/terraform-provider-github
 ...
 ```
 
-In order to test the provider, you can simply run `make test`.
-
-```sh
-$ make test
-```
-
-In order to run the full suite of Acceptance tests, run `make testacc`.
+In order to run the full suite of provider acceptance tests, run `make testacc`.
 
 *Note:* Acceptance tests create real resources, and often cost money to run.
 
@@ -200,6 +194,8 @@ export GITHUB_TEST_USER_TOKEN=
 ```
 
 See [this project](https://github.com/terraformtesting/acceptance-tests) for more information on how tests are run automatically.
+
+There are also a small amount of unit tests in the provider. Due to the nature of the provider, such tests are currently only recommended for exercising functionality completely internal to the provider. These may be executed by running `make test`.
 
 ### GitHub Personal Access Token
 

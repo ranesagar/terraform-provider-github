@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 
+	"github.com/google/go-github/v45/github"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -25,6 +27,11 @@ func dataSourceGithubRepository() *schema.Resource {
 				Optional:      true,
 				Computed:      true,
 				ConflictsWith: []string{"full_name"},
+			},
+			"only_protected_branches": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
 			},
 
 			"description": {
@@ -199,12 +206,18 @@ func dataSourceGithubRepositoryRead(d *schema.ResourceData, meta interface{}) er
 	}
 
 	if repoName == "" {
-		return fmt.Errorf("One of %q or %q has to be provided", "full_name", "name")
+		return fmt.Errorf("one of %q or %q has to be provided", "full_name", "name")
 	}
 
-	log.Printf("[DEBUG] Reading GitHub repository %s/%s", owner, repoName)
 	repo, _, err := client.Repositories.Get(context.TODO(), owner, repoName)
 	if err != nil {
+		if err, ok := err.(*github.ErrorResponse); ok {
+			if err.Response.StatusCode == http.StatusNotFound {
+				log.Printf("[DEBUG] Missing GitHub repository %s/%s", owner, repoName)
+				d.SetId("")
+				return nil
+			}
+		}
 		return err
 	}
 
@@ -234,7 +247,12 @@ func dataSourceGithubRepositoryRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("repo_id", repo.GetID())
 	d.Set("has_projects", repo.GetHasProjects())
 
-	branches, _, err := client.Repositories.ListBranches(context.TODO(), owner, repoName, nil)
+	onlyProtectedBranches := d.Get("only_protected_branches").(bool)
+	listBranchOptions := &github.BranchListOptions{
+		Protected: &onlyProtectedBranches,
+	}
+
+	branches, _, err := client.Repositories.ListBranches(context.TODO(), owner, repoName, listBranchOptions)
 	if err != nil {
 		return err
 	}
